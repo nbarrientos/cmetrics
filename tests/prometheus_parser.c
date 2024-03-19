@@ -1665,6 +1665,27 @@ void test_issue_fluent_bit_6534()
     cmt_decode_prometheus_destroy(cmt);
 }
 
+void test_recording_rules()
+{
+    cfl_sds_t result;
+    const char expected[] = (
+            "# TYPE a:b:c:d:e untyped"
+            "a:b:c:d:e{dev=\"Calyptia\",lang=\"C\",} 1 0\n"
+            );
+
+    struct fixture *f = init(0,
+            "# TYPE a:b:c:d:e untyped"
+            "a:b:c:d:e{dev=\"Calyptia\",lang=\"C\",} 1 0\n"
+            );
+
+    TEST_CHECK(parse(f) == 0);
+    result = cmt_encode_prometheus_create(f->context.cmt, CMT_TRUE);
+    TEST_CHECK(strcmp(result, expected) == 0);
+    cfl_sds_destroy(result);
+
+    destroy(f);
+}
+
 TEST_LIST = {
     {"header_help", test_header_help},
     {"header_type", test_header_type},
@@ -1697,5 +1718,6 @@ TEST_LIST = {
     {"pr_168", test_pr_168},
     {"histogram_different_label_count", test_histogram_different_label_count},
     {"issue_fluent_bit_6534", test_issue_fluent_bit_6534},
+    {"recording_rules", test_recording_rules},
     { 0 }
 };
